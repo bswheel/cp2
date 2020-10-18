@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Worldwide Holiday App</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+
+<body class="content">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="title" href="/">World Holiday App</a>
+
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item disabled">
+          <a class="nav-link" href="/">Store</a>
+        </li>
+        <li class="nav-item disabled">
+          <a class="nav-link" href="/">Gallery</a>
+        </li>
+        <li class="nav-item disabled">
+          <a class="nav-link" href="/">About</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0">
+        <b>Enter a Country: </b>
+        <div>
+          <input id="country" name="someCountry" placeholder="country name" type="text">
+        </div>
+        <button class="btn btn-outline-success my-2 my-sm-0" id="submitCountry">Submit</button>
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Login</button>
+      </form>
+    </div>
+  </nav>
+
+  <div id="holidayResults">
+  </div>
+
+    <div class="footer">
+      <hr>
+      <a href="https://github.com/bswheel/cp2">GitHub</a>
+    </div>
+
+</body>
+<script src="moment.js"></script>
+<script>
+
+   function autocomplete(inp, arr) {
+     /*the autocomplete function takes two arguments,
+     the text field element and an array of possible autocompleted values:*/
+     var currentFocus;
+     /*execute a function when someone writes in the text field:*/
+     inp.addEventListener("input", function(e) {
+       var a, b, i, val = this.value;
+       /*close any already open lists of autocompleted values*/
+       closeAllLists();
+       if (!val) { return false;}
+       currentFocus = -1;
+       /*create a DIV element that will contain the items (values):*/
+       a = document.createElement("DIV");
+       a.setAttribute("id", this.id + "autocomplete-list");
+       a.setAttribute("class", "autocomplete-items");
+       /*append the DIV element as a child of the autocomplete container:*/
+       this.parentNode.appendChild(a);
+       /*for each item in the array...*/
+       for (i = 0; i < arr.length; i++) {
+         /*check if the item starts with the same letters as the text field value:*/
+         if (arr[i].value.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+           /*create a DIV element for each matching element:*/
+           b = document.createElement("DIV");
+           /*make the matching letters bold:*/
+           b.innerHTML = "<strong>" + arr[i].value.substr(0, val.length) + "</strong>";
+           b.innerHTML += arr[i].value.substr(val.length);
+           /*insert a input field that will hold the current array item's value:*/
+           b.innerHTML += "<input type='hidden' name='" + arr[i].key + "' id='country' value='" + arr[i].value + "'>";
+           /*execute a function when someone clicks on the item value (DIV element):*/
+           b.addEventListener("click", function(e) {
+             /*insert the value for the autocomplete text field:*/
+             inp.value = this.getElementsByTagName("input")[0].value;
+             inp.name = this.getElementsByTagName("input")[0].name
+             /*close the list of autocompleted values,
+             (or any other open lists of autocompleted values:*/
+             closeAllLists();
+           });
+           a.appendChild(b);
+         }
+       }
+     });
+     /*execute a function presses a key on the keyboard:*/
+     inp.addEventListener("keydown", function(e) {
+       var x = document.getElementById(this.id + "autocomplete-list");
+       if (x) x = x.getElementsByTagName("div");
+       if (e.keyCode == 40) {
+         /*If the arrow DOWN key is pressed,
+         increase the currentFocus variable:*/
+         currentFocus++;
+         /*and and make the current item more visible:*/
+         addActive(x);
+       } else if (e.keyCode == 38) { //up
+         /*If the arrow UP key is pressed,
+         decrease the currentFocus variable:*/
+         currentFocus--;
+         /*and and make the current item more visible:*/
+         addActive(x);
+       } else if (e.keyCode == 13) {
+         /*If the ENTER key is pressed, prevent the form from being submitted,*/
+         e.preventDefault();
+         if (currentFocus > -1) {
+           /*and simulate a click on the "active" item:*/
+           if (x) x[currentFocus].click();
+         }
+       }
+     });
+     function addActive(x) {
+       /*a function to classify an item as "active":*/
+       if (!x) return false;
+       /*start by removing the "active" class on all items:*/
+       removeActive(x);
+       if (currentFocus >= x.length) currentFocus = 0;
+       if (currentFocus < 0) currentFocus = (x.length - 1);
+       /*add class "autocomplete-active":*/
+       x[currentFocus].classList.add("autocomplete-active");
+     }
+     function removeActive(x) {
+       /*a function to remove the "active" class from all autocomplete items:*/
+       for (var i = 0; i < x.length; i++) {
+         x[i].classList.remove("autocomplete-active");
+       }
+     }
+     function closeAllLists(elmnt) {
+       /*close all autocomplete lists in the document,
+       except the one passed as an argument:*/
+       var x = document.getElementsByClassName("autocomplete-items");
+       for (var i = 0; i < x.length; i++) {
+         if (elmnt != x[i] && elmnt != inp) {
+           x[i].parentNode.removeChild(x[i]);
+         }
+       }
+     }
+     /*execute a function when someone clicks in the document:*/
+     document.addEventListener("click", function (e) {
+       closeAllLists(e.target);
+     });
+   }
+   const url = "https://cors-anywhere.herokuapp.com/date.nager.at/Api/v2/AvailableCountries"
+   fetch(url).then(function(response) {
+     return response.json()
+   }).then(function(json){
+     console.log('countries', json)
+
+     const worldUrl = "https://cors-anywhere.herokuapp.com/date.nager.at/Api/v2/NextPublicHolidaysWorldwide"
+     fetch(worldUrl).then(function(response) {
+       return response.json()
+     }).then(function(holidays){
+       console.log('world holidays', holidays)
+       let countryName = null
+       let holidayResults = '<h1><b>Upcoming World Holidays</b></h1>'
+       for(let i = 0; i < holidays.length; i ++){
+         let holiday = holidays[i]
+          for (let j = 0; j < json.length; j ++) {
+            let c = json[j]
+            if (json[j].key === holidays[i].countryCode) {
+              countryName = json[j].value
+              break
+            }
+          }
+         let date = moment(holidays[i].date).format('MMMM Do YYYY')
+         let localName = holidays[i].localName
+         let name = holidays[i].name
+         holidayResults += '<h2><b>' + countryName + ' -- ' + date + '</b></h2>'
+         holidayResults += '<h3>Local Name: ' + localName + '</h3>'
+         holidayResults += '<h3>English Name: ' + name + '</h3>'
+       }
+       document.getElementById("holidayResults").innerHTML = holidayResults
+     })
+     autocomplete(document.getElementById("country"), json)
+   })
+
+
+   document.getElementById("submitCountry").addEventListener('click', function(event) {
+     event.preventDefault();
+     let country = document.getElementById("country").value
+     let countryCode = document.getElementById("country").name
+     const countryUrl = "https://cors-anywhere.herokuapp.com/date.nager.at/Api/v2/publicholidays/2020/" + countryCode
+     fetch(countryUrl).then(function (response) {
+       return response.json()
+     }).then(function (holidays) {
+       console.log('holidays', holidays)
+       let holidayDiv = '<h1><b>' + country + ' Holidays 2020</b></h1>'
+       for(let i = 0; i < holidays.length; i ++){
+         let date = moment(holidays[i].date).format('MMMM Do YYYY')
+         let localName = holidays[i].localName
+         let name = holidays[i].name
+         holidayDiv += '<h2><b>' + date + '</b></h2>'
+         holidayDiv += '<h3>Local Name: ' + localName + '</h3>'
+         holidayDiv += '<h3>English Name: ' + name + '</h3>'
+       }
+       document.getElementById('holidayResults').innerHTML = holidayDiv
+     })
+   })
+ </script>
+
+  <style>
+    .title {
+      color: black;
+      font-size: 20pt;
+      font-weight: bolder;
+      padding-left: 25px;
+      padding-right: 25px;
+      margin: auto;
+    }
+
+    .content {
+      background-color: skyblue;
+    }
+
+    /*the container must be positioned relative:*/
+    .autocomplete {
+      position: relative;
+      display: inline-block;
+    }
+
+    input {
+      border: 1px solid transparent;
+      background-color: #f1f1f1;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    input[type=text] {
+      background-color: #f1f1f1;
+      width: 100%;
+    }
+
+    input[type=submit] {
+      background-color: DodgerBlue;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid #d4d4d4;
+      border-bottom: none;
+      border-top: none;
+      z-index: 99;
+      /*position the autocomplete items to be the same width as the container:*/
+      top: 100%;
+      left: 0;
+      right: 0;
+    }
+
+    .autocomplete-items div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #fff;
+      border-bottom: 1px solid #d4d4d4;
+    }
+
+    /*when hovering an item:*/
+    .autocomplete-items div:hover {
+      background-color: #e9e9e9;
+    }
+
+    /*when navigating through the items using the arrow keys:*/
+    .autocomplete-active {
+      background-color: DodgerBlue !important;
+      color: #ffffff;
+    }
+
+    #holidayResults {
+      max-width: 600px;
+      margin: auto;
+      justify-content: center;
+      text-align: center;
+      text-transform: capitalize;
+    }
+
+    .footer {
+      width: 100%;
+      text-align: center;
+      padding: 25px;
+    }
+  </style>
+
+</html>
